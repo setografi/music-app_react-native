@@ -1,12 +1,35 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
+import { Tabs } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import React, { ComponentProps } from "react";
+import { TabBarIcon } from "@/components/navigation/TabBarIcon";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { BlurView } from "expo-blur";
+import { Platform, StyleSheet } from "react-native";
+import { SymbolView } from "expo-symbols";
+import { Colors } from "@/constants/Colors";
 
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+// Helper component for cross-platform icons
+function TabIcon({
+  sfSymbol,
+  ionIcon,
+  color,
+}: {
+  sfSymbol: string;
+  ionIcon: ComponentProps<typeof Ionicons>["name"];
+  color: string;
+}) {
+  // if (Platform.OS === 'ios') {
+  //   return (
+  //     <SymbolView
+  //       name={sfSymbol}
+  //       size={24}
+  //       tintColor={color}
+  //       fallback={<TabBarIcon name={ionIcon} color={color} />}
+  //     />
+  //   );
+  // }
+  return <TabBarIcon name={ionIcon} color={color} />;
+}
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -14,30 +37,98 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: "#FA2D48",
         headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
-      }}>
+        tabBarStyle: {
+          position: "absolute",
+          backgroundColor: Platform.select({
+            ios: "transparent",
+            android: "rgba(255, 255, 255, 0.8)", // Fallback for Android
+          }),
+          borderTopWidth: 0,
+          elevation: 0,
+          // height: 94,
+          height: 60,
+          paddingTop: 0,
+          paddingBottom: 20,
+        },
+        tabBarBackground: () =>
+          Platform.OS === "ios" ? (
+            <BlurView
+              tint={
+                colorScheme === "dark"
+                  ? "systemThickMaterialDark"
+                  : "systemThickMaterialLight"
+              }
+              intensity={80}
+              style={StyleSheet.absoluteFill}
+            />
+          ) : null,
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: "Home",
+          tabBarIcon: ({ color }) => (
+            <TabIcon
+              sfSymbol="music.note.house"
+              ionIcon="home-sharp"
+              color={color}
+            />
+          ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="new"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: "New",
+          tabBarIcon: ({ color }) => (
+            <TabIcon
+              sfSymbol="square.grid.2x2.fill"
+              ionIcon="apps-sharp"
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="radio"
+        options={{
+          title: "Radio",
+          tabBarIcon: ({ color }) => (
+            <TabIcon
+              sfSymbol="dot.radiowaves.left.and.right"
+              ionIcon="radio-outline"
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="library"
+        options={{
+          title: "Library",
+          tabBarIcon: ({ color }) => (
+            <TabIcon
+              sfSymbol="music.note.list"
+              ionIcon="musical-notes"
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="search"
+        options={{
+          title: "Search",
+          tabBarIcon: ({ color }) => (
+            <TabIcon
+              sfSymbol="magnifyingglass"
+              ionIcon="search"
+              color={color}
+            />
+          ),
         }}
       />
     </Tabs>
